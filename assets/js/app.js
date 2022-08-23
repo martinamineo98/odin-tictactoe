@@ -4,14 +4,8 @@
 // Each string contained inside each row is a cell.
 // Each cell with the same index belongs to the same column.
 
-// Winning combinations:
-// 1. Each cell in the same row are identical.
-// 2. Each cell in the same column are identical.
-// 3. arr[0][0], arr[1][1] and arr[2][2] are identical.
-// 4. arr[0][2], arr[1][1] and arr[2][0] are identical.
-
 const Gameboard = (function() {
-	
+
 	const arr = [
 		['', '', ''],
 		['', '', ''],
@@ -19,7 +13,7 @@ const Gameboard = (function() {
 	]
 	
 	// Populate the gameboard.
-	// Each row and cell has its own data-attribute to change their
+	// Each row and cell has its own data attribute to change their
 	// content a little easier.
 	
 	const populateDOM = (function() {
@@ -43,22 +37,51 @@ const Gameboard = (function() {
 		}
 	})()
 	
+	// I need to verify if there is a winning combination present in the
+	// array.
+	
+	// 1) If all items in the same row are equal.
+	// 2) If all items in the same column are equal.
+	// 3) If all items in the same diagonal are equal.
+	//		arr[0][0] == arr[1][1] == arr[2][2]
+	//		arr[0][2] == arr[1][1] == arr[2][0]
+	
+	// I need to get the value of one of the winning cells and
+	// confront it with each of the players' markers.
+	
+	// If each item of the arr is not empty and there is no winner,
+	// the game ends in a tie.
+	
+	// I might keep track of the number of turns to avoiding checking
+	// if the array is empty. If there are no more turns, the game ends
+	// in a tie.
+	
+	const getGameWinner = () => {
+		
+	}
+	
 	return {
 		arr,
-		populateDOM
+		populateDOM,
+		getGameWinner
 	}
 	
 })()
 
 const displayController = (function() {
-	let cells = Gameboard.populateDOM.container.querySelectorAll('.cell')
+	const cells = Gameboard.populateDOM.container.querySelectorAll('.cell')
 	
 	// When clicked, and it is not full, add the player's marker to the cell.
+	// When clicked, and it is not full, add the player's marker to the array.
 	
-	function addMarker(marker) {
+	const addMarker = (marker) => {
 		cells.forEach((cell) => {
+			const row = cell.getAttribute('data-row')
+			const col = cell.getAttribute('data-col')
+			
 			if (cell.classList.contains('isFull') == false) {
 				cell.addEventListener('click', () => {
+					Gameboard.arr[row][col] = marker
 					cell.textContent = marker
 					cell.classList.toggle('isEmpty')
 					cell.classList.toggle('isFull')
@@ -90,33 +113,4 @@ function createPlayer(name, marker) {
 const player1 = createPlayer('Player 1', 'X')
 const player2 = createPlayer('Player 2', '0')
 
-// How to figure out when each turn starts and ends ?
-
-// When the game starts, it's the player1's turn. After its turn is
-// finished, it's the player2's turn.
-
-// player1Turn = true
-// player2Turn = false
-
-// playerTurn = player1 || player2 ???
-// playerTurn.addMarker() ???
-
-// if the player1Turn boolean is true, player1.addMarker()
-// if the player2Turn boolean is true, player2.addMarker()
-
-// while (gameWinner == false) ?
-
-// Maybe ?
-
-// Between each turn, the game needs to check if one of the possible
-// winning combinations was reached. If there is a winner the game ends.
-
-// How to check for each winning combinations ?
-
-// I need to check the data-row and data-col attributes of the cell.
-// Identical rows, identical columns or diagonal (0 1 2 or 2 1 0)
-
-// How to check for the winner ?
-// Get the marker of each winning combinations ?
-
-// The game needs to change the gameWinner boolean to true
+player1.addMarker()
