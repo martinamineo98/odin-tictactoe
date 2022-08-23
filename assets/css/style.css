@@ -70,7 +70,7 @@ body {
 	background-color: var(--cell-bg-color);
 	color: var(--cell-bg-color);
 	display: flex;
-	font-size: 5em;
+	font-size: 4em;
 	font-weight: bold;
 	place-content: center;
 	place-items: center;
@@ -82,5 +82,6 @@ body {
 }
 
 .cell.isWinningCombination {
+	font-size: 4.35em;
 	transform: scale(1.35);
 }

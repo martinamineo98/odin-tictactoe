@@ -7,9 +7,11 @@
 const Gameboard = (function() {
 
 	const arr = [
-		['X', 'X', 'X'],
-		['X', '', ''],
-		['X', '', '']
+	
+		['', '', ''],
+		['', '', ''],
+		['', '', '']
+		
 	]
 	
 	// Populate the gameboard.
@@ -46,56 +48,117 @@ const Gameboard = (function() {
 	
 	// 1) If all items in the same row are equal.
 	// 2) If all items in the same column are equal.
-	// 3) If all items in the same diagonal are equal.
+	// 3) If all items in the same diagonal are equal. (2D Array Matrix)
 	//		arr[0][0] == arr[1][1] == arr[2][2]
 	//		arr[0][2] == arr[1][1] == arr[2][0]
 	
 	let gameTurns = 9
-	let hasWinner
+	let winnerMarker
 	
-	const getGameWinner = () => {	
-
+	const getGameWinner = () => {
+		
+		// To change the classes of the cells easier, I've decided to push each
+		// DOM row element in its own array, it follows the same order of the
+		// original Gameboard.arr
+		
+		const arrNode = []
+		
+		const populateNodeArr = (function() {
+			for (let i = 0; i < arr.length; i++) {
+				const arrRow = populateDOM.container.querySelectorAll(`[data-row='${i}']`)
+				arrNode.push(arrRow)
+			}
+		})()
+		
 		// Check if all items in the same row are equal.
-		const checkIfRow = (function() {		
-			arr.forEach((row, index) => {
-				const cells = populateDOM.container.querySelectorAll(`[data-row='${index}']`)
-				
+		
+		const checkIfRow = (function(){
+			arr.forEach((row, rowIndex) => {
 				if (!help.allEmpty(row) && help.allEqual(row)) {
-					console.log(row)
 					populateDOM.isWinning()
-					cells.forEach((cell) => populateDOM.isWinning(cell))
-					hasWinner = true
+					arrNode[rowIndex].forEach((el) => populateDOM.isWinning(el))
+					winnerMarker = arrNode[rowIndex][0].textContent
 				}
 			})
 		})()
 		
 		// Check if all items in the same column are equal.
-		// All the columns have the number of the row at index 0.
 		
 		const checkIfCol = (function() {
-			const cols = help.getAllColumns(arr)
-			let correctCol
+			const columns = help.getAllColumns(arr)
 			let cells
 			
-			cols.forEach((col, colIndex) => {
+			columns.forEach((col, colIndex) => {
 				if (!help.allEmpty(col[1]) && help.allEqual(col[1])) {
-					correctCol = colIndex
+					cells = populateDOM.container.querySelectorAll(`[data-col='${colIndex}']`)
 					populateDOM.isWinning()
-					cells = populateDOM.container.querySelectorAll(`[data-col='${correctCol}']`)
+					winnerMarker = cells[colIndex].textContent
 				}
 			})
 			
-			if (cells) cells.forEach((cell) => populateDOM.isWinning(cell))
+			if (cells != undefined) cells.forEach((cell) => populateDOM.isWinning(cell))
 		})()
 		
 		// Check if all items in the same diagonal are equal.
 		
+		const checkIfDia = (function() {
+			
+			// Array Elements
+			const arrLeft = []
+			const arrRight = []
+			
+			// DOM Elements
+			const diaLeft = []
+			const diaRight = []
+			
+			// Thanks to: https://gist.github.com/Erushenko/308b4ab9dfd0bdfae12e72ccc710376a
+			
+			for (let i = 0; i < arr.length; i++) {
+				const oppositeIndex = arr.length - i - 1
+				arrLeft.push(arr[i][i])
+				arrRight.push(arr[i][oppositeIndex])
+				diaLeft.push(arrNode[i][i])
+				diaRight.push(arrNode[i][oppositeIndex])
+			}
+			
+			if (!help.allEmpty(arrLeft) && help.allEqual(arrLeft)) {
+				populateDOM.isWinning()
+				diaLeft.forEach((cell) => populateDOM.isWinning(cell))
+				winnerMarker = diaLeft[0].textContent
+			}
+			
+			if (!help.allEmpty(arrRight) && help.allEqual(arrRight)) {
+				populateDOM.isWinning()
+				diaRight.forEach((cell) => populateDOM.isWinning(cell))
+				winnerMarker = diaRight[0].textContent
+			}
+		})()
 		
-		if (hasWinner) {
-			gameTurns = 0
-		} else {
+		// If we do not have a winner, we reduce the number of turns.
+		// If we have a winner, we do not have any more turns.
+		
+		if (winnerMarker == undefined) {
 			gameTurns--
+		} else {
+			gameTurns = 0
 		}
+		
+		// If the marker of the winner is 'X', player1 has won.
+		// If the marker of the winner is 'O', player 2 has won.
+		
+		if (winnerMarker && winnerMarker == 'X') {
+			player1.hasWon()
+		} else if (winnerMarker && winnerMarker == 'O') {
+			player2.hasWon()
+		}
+		
+		// If there are no more turns, and we don't have a winner,
+		// it is a tie.
+		
+		if (gameTurns == 0 && winnerMarker == undefined) {
+			displayController.tie()
+		}
+		
 	}
 	
 	return {
@@ -108,6 +171,7 @@ const Gameboard = (function() {
 
 const displayController = (function() {
 	const cells = Gameboard.populateDOM.container.querySelectorAll('.cell')
+	const heading = document.querySelector('.header-player')
 	
 	// When clicked, and it is not full, add the player's marker to the cell.
 	// When clicked, and it is not full, add the player's marker to the array.
@@ -129,8 +193,21 @@ const displayController = (function() {
 		})
 	}
 	
+	// When the game has a winner or the game turns are finished, we need
+	// to show the name of the winner on the screen.
+	
+	const showWinner = (name) => {
+		heading.textContent = `${name} has won!`
+	}
+	
+	const tie = () => {
+		heading.textContent = 'And it\'s a tie!'
+	}
+	
 	return {
-		addMarker
+		addMarker,
+		showWinner,
+		tie
 	}
 	
 })()
@@ -175,6 +252,10 @@ const help = (function(){
 const playerActions = {
 	addMarker() {
 		displayController.addMarker(this.marker)
+	},
+
+	hasWon() {
+		displayController.hasWon(this.name)
 	}
 }
 
@@ -190,5 +271,16 @@ const player1 = createPlayer('Player 1', 'X')
 const player2 = createPlayer('Player 2', '0')
 
 player1.addMarker()
-
 Gameboard.getGameWinner()
+
+// Turn 1: player1
+// Turn 2: player2
+// etc.
+
+// At each turn, we need to change the marker.
+// At each turn, we need to check if there is a winner.
+// If at the last turn there are no winners, the game ends in a tie.
+
+// if (gameTurn == 0 && winnerMarker == undefined) displayController.tie()
+// if (winnerMarker == 'X') player1.hasWon()
+// if (winnerMarker == 'O') player2.hasWon()
