@@ -1,4 +1,6 @@
 
+let playerTurn = 0
+
 // The gameboard will be stored in an array.
 // Each array contained inside the main array is a row.
 // Each string contained inside each row is a cell.
@@ -177,7 +179,17 @@ const displayController = (function() {
 	// When clicked, and it is not full, add the player's marker to the array.
 	// The Event Listener activates solely when the cell lacks the isFull class.
 	
-	const addMarker = (marker) => {
+	const addMarker = () => {
+		let marker = updateMarker()
+		
+		function updateMarker() {
+			return playerTurn == 0 ? 'X' : 'O'
+		}
+		
+		function updatePlayerTurn() {
+			return playerTurn == 0 ? 1 : 0
+		}
+		
 		cells.forEach((cell) => {
 			const row = cell.getAttribute('data-row')
 			const col = cell.getAttribute('data-col')
@@ -186,8 +198,14 @@ const displayController = (function() {
 				cell.addEventListener('click', () => {
 					Gameboard.arr[row][col] = marker
 					cell.textContent = marker
-					cell.classList.toggle('isEmpty')
-					cell.classList.toggle('isFull')
+					cell.classList.remove('isEmpty')
+					cell.classList.add('isFull')
+					
+					console.log(marker, playerTurn)
+					
+					playerTurn = updatePlayerTurn()
+					marker = updateMarker()
+					Gameboard.getGameWinner()
 				})
 			}
 		})
@@ -250,12 +268,8 @@ const help = (function(){
 })()
 
 const playerActions = {
-	addMarker() {
-		displayController.addMarker(this.marker)
-	},
-
 	hasWon() {
-		displayController.hasWon(this.name)
+		displayController.showWinner(this.name)
 	}
 }
 
@@ -270,17 +284,4 @@ function createPlayer(name, marker) {
 const player1 = createPlayer('Player 1', 'X')
 const player2 = createPlayer('Player 2', '0')
 
-player1.addMarker()
-Gameboard.getGameWinner()
-
-// Turn 1: player1
-// Turn 2: player2
-// etc.
-
-// At each turn, we need to change the marker.
-// At each turn, we need to check if there is a winner.
-// If at the last turn there are no winners, the game ends in a tie.
-
-// if (gameTurn == 0 && winnerMarker == undefined) displayController.tie()
-// if (winnerMarker == 'X') player1.hasWon()
-// if (winnerMarker == 'O') player2.hasWon()
+displayController.addMarker()
