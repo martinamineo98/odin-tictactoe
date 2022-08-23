@@ -6,4 +6,4 @@ Tic Tac Toe Game created while following The Odin Project's Full Stack Javascrip
 The game is playable at: https://martinamineo98.github.io/odin-tictactoe/
 
 Notes:
-- I obtained the diagonal combination thanks to this [Gist](https://gist.github.com/Erushenko/308b4ab9dfd0bdfae12e72ccc710376a) from the Github User [Erushenko](https://github.com/erushenko).
+- I obtained the diagonal winning combinations thanks to this [Gist](https://gist.github.com/Erushenko/308b4ab9dfd0bdfae12e72ccc710376a) from the Github User [Erushenko](https://github.com/erushenko).
