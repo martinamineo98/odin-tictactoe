@@ -31,7 +31,7 @@ const Gameboard = (function() {
 						cellDiv.classList.toggle('cell')
 						cellDiv.classList.toggle('isEmpty')
 						cellDiv.setAttribute('data-row', r)
-						cellDiv.setAttribute('data-column', c)
+						cellDiv.setAttribute('data-col', c)
 						cellDiv.textContent = cell
 						
 				container.appendChild(cellDiv)
@@ -73,22 +73,6 @@ const displayController = (function() {
 	
 })()
 
-// How to figure out when each turn starts and ends ?
-
-// When the game starts, it's the player1's turn. After its turn is
-// finished, it's the player2's turn.
-
-// player1Turn = true
-// player2Turn = false
-
-// if the player1Turn boolean is true, player1.addMarker()
-// if the player2Turn boolean is true, player2.addMarker()
-
-// Maybe ?
-
-// Between each turn, the game needs to check if one of the possible
-// winning combinations was reached. If there is a winner the game ends.
-
 const playerActions = {
 	addMarker() {
 		displayController.addMarker(this.marker)
@@ -106,4 +90,33 @@ function createPlayer(name, marker) {
 const player1 = createPlayer('Player 1', 'X')
 const player2 = createPlayer('Player 2', '0')
 
-player1.addMarker()
+// How to figure out when each turn starts and ends ?
+
+// When the game starts, it's the player1's turn. After its turn is
+// finished, it's the player2's turn.
+
+// player1Turn = true
+// player2Turn = false
+
+// playerTurn = player1 || player2 ???
+// playerTurn.addMarker() ???
+
+// if the player1Turn boolean is true, player1.addMarker()
+// if the player2Turn boolean is true, player2.addMarker()
+
+// while (gameWinner == false) ?
+
+// Maybe ?
+
+// Between each turn, the game needs to check if one of the possible
+// winning combinations was reached. If there is a winner the game ends.
+
+// How to check for each winning combinations ?
+
+// I need to check the data-row and data-col attributes of the cell.
+// Identical rows, identical columns or diagonal (0 1 2 or 2 1 0)
+
+// How to check for the winner ?
+// Get the marker of each winning combinations ?
+
+// The game needs to change the gameWinner boolean to true
