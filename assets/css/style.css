@@ -59,6 +59,11 @@ body {
 	grid-template-rows: repeat(3, 1fr);
 	min-height: 50vh;
 	max-height: 100vh;
+	transition: all .25s ease-in-out;
+}
+
+.gameboard.isWinningCombination {
+	gap: 60px;
 }
 
 .cell {
@@ -74,4 +79,8 @@ body {
 
 .cell.isFull {
 	color: #000000;
+}
+
+.cell.isWinningCombination {
+	transform: scale(1.35);
 }

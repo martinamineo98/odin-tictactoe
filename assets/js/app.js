@@ -7,9 +7,9 @@
 const Gameboard = (function() {
 
 	const arr = [
-		['', '', ''],
-		['', '', ''],
-		['', '', '']
+		['X', 'X', 'X'],
+		['X', '', ''],
+		['X', '', '']
 	]
 	
 	// Populate the gameboard.
@@ -19,26 +19,30 @@ const Gameboard = (function() {
 	const populateDOM = (function() {
 		const container = document.querySelector('.gameboard')
 		
-		arr.forEach((row, r) => {
-			row.forEach((cell, c) => {
-				let cellDiv = document.createElement('div')
-						cellDiv.classList.toggle('cell')
-						cellDiv.classList.toggle('isEmpty')
-						cellDiv.setAttribute('data-row', r)
-						cellDiv.setAttribute('data-col', c)
-						cellDiv.textContent = cell
-						
-				container.appendChild(cellDiv)
+		const createCells = (function(){
+			arr.forEach((row, r) => {
+					row.forEach((cell, c) => {
+						let cellDiv = document.createElement('div')
+								cellDiv.classList.toggle('cell')
+								cellDiv.classList.toggle('isEmpty')
+								cellDiv.setAttribute('data-row', r)
+								cellDiv.setAttribute('data-col', c)
+								cellDiv.textContent = ''
+								
+						container.appendChild(cellDiv)
+				})
 			})
-		})
+		})()
+		
+		const isWinning = (el = container) => {
+			el.classList.add('isWinningCombination')
+		}
 		
 		return {
-			container
+			container,
+			isWinning
 		}
 	})()
-	
-	// I need to verify if there is a winning combination present in the
-	// array.
 	
 	// 1) If all items in the same row are equal.
 	// 2) If all items in the same column are equal.
@@ -46,18 +50,52 @@ const Gameboard = (function() {
 	//		arr[0][0] == arr[1][1] == arr[2][2]
 	//		arr[0][2] == arr[1][1] == arr[2][0]
 	
-	// I need to get the value of one of the winning cells and
-	// confront it with each of the players' markers.
+	let gameTurns = 9
+	let hasWinner
 	
-	// If each item of the arr is not empty and there is no winner,
-	// the game ends in a tie.
-	
-	// I might keep track of the number of turns to avoiding checking
-	// if the array is empty. If there are no more turns, the game ends
-	// in a tie.
-	
-	const getGameWinner = () => {
+	const getGameWinner = () => {	
+
+		// Check if all items in the same row are equal.
+		const checkIfRow = (function() {		
+			arr.forEach((row, index) => {
+				const cells = populateDOM.container.querySelectorAll(`[data-row='${index}']`)
+				
+				if (!help.allEmpty(row) && help.allEqual(row)) {
+					console.log(row)
+					populateDOM.isWinning()
+					cells.forEach((cell) => populateDOM.isWinning(cell))
+					hasWinner = true
+				}
+			})
+		})()
 		
+		// Check if all items in the same column are equal.
+		// All the columns have the number of the row at index 0.
+		
+		const checkIfCol = (function() {
+			const cols = help.getAllColumns(arr)
+			let correctCol
+			let cells
+			
+			cols.forEach((col, colIndex) => {
+				if (!help.allEmpty(col[1]) && help.allEqual(col[1])) {
+					correctCol = colIndex
+					populateDOM.isWinning()
+					cells = populateDOM.container.querySelectorAll(`[data-col='${correctCol}']`)
+				}
+			})
+			
+			if (cells) cells.forEach((cell) => populateDOM.isWinning(cell))
+		})()
+		
+		// Check if all items in the same diagonal are equal.
+		
+		
+		if (hasWinner) {
+			gameTurns = 0
+		} else {
+			gameTurns--
+		}
 	}
 	
 	return {
@@ -73,6 +111,7 @@ const displayController = (function() {
 	
 	// When clicked, and it is not full, add the player's marker to the cell.
 	// When clicked, and it is not full, add the player's marker to the array.
+	// The Event Listener activates solely when the cell lacks the isFull class.
 	
 	const addMarker = (marker) => {
 		cells.forEach((cell) => {
@@ -96,6 +135,43 @@ const displayController = (function() {
 	
 })()
 
+const help = (function(){
+	
+	// Check if each elements in an array are empty strings.
+	const allEmpty = (arr) => {
+		return arr.every((el) => el == '' ? true : false)
+	}
+	
+	// Check if each elements in an array is identical.
+	const allEqual = (arr) => {
+		return arr.every((el) => el == arr[0])
+	}
+	
+	// Give me each item in each row with the same index in a 2D array.
+	const getColumn = (arr, num) => {
+		return arr.map((el) => el[num])
+	}
+	
+	const getAllColumns = (arr) => {
+		let newArr = []
+		
+		for (let index = 0; index < arr.length; index++) {
+			let newArrInside = [index, getColumn(arr, index)]
+			newArr.push(newArrInside)
+		}
+		
+		return newArr
+	}
+	
+	return {
+		allEmpty,
+		allEqual,
+		getColumn,
+		getAllColumns
+	}
+	
+})()
+
 const playerActions = {
 	addMarker() {
 		displayController.addMarker(this.marker)
@@ -114,3 +190,5 @@ const player1 = createPlayer('Player 1', 'X')
 const player2 = createPlayer('Player 2', '0')
 
 player1.addMarker()
+
+Gameboard.getGameWinner()
