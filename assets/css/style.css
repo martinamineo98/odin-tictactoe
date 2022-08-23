@@ -1,4 +1,11 @@
 
+/* -------------------------------------------------------- VARIABLES */
+
+:root {
+	--main-font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui, helvetica neue, helvetica, Cantarell, Ubuntu, roboto, noto, arial, sans-serif;
+	--cell-bg-color: #EEEEEE;
+}
+
 /* ------------------------------------------------------------ RESET */
 
 *,
@@ -32,3 +39,39 @@ table {
 }
 
 /* ---------------------------------------------------------- GENERAL */
+
+body {
+	display: flex;
+	flex-direction: column;
+	font: calc(1.6rem + .5vmin) var(--main-font-family);
+	min-height: 100vh;
+	place-content: center;
+	place-items: center;
+}
+
+/* -------------------------------------------------------- GAMEBOARD */
+
+.gameboard {
+	aspect-ratio: 1;
+	display: grid;
+	gap: 15px;
+	grid-template-columns: repeat(3, 1fr);
+	grid-template-rows: repeat(3, 1fr);
+	min-height: 50vh;
+	max-height: 100vh;
+}
+
+.cell {
+	background-color: var(--cell-bg-color);
+	color: var(--cell-bg-color);
+	display: flex;
+	font-size: 5em;
+	font-weight: bold;
+	place-content: center;
+	place-items: center;
+	transition: all .25s ease-in-out;
+}
+
+.cell.isFull {
+	color: #000000;
+}
